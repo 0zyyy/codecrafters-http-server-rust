@@ -1,5 +1,7 @@
 // Uncomment this block to pass the first stage
-use std::{io::{Read, Write}, net::{TcpListener, TcpStream}};
+use std::{io::{Read, Write}, net::{TcpListener, TcpStream}, str::from_utf8};
+
+use nom::AsBytes;
 
 fn main() {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -24,7 +26,17 @@ fn main() {
 fn handle_client(mut stream: TcpStream){
     let mut buff: [u8; 512] = [0; 512]; 
 
-    let _ = stream.read(&mut buff);
-    stream.write_all(b"HTTP/1.1 200 OK\r\n\r\n").unwrap()
+    stream.read(&mut buff).unwrap();
+
+    let headers = from_utf8(&buff).unwrap();
+    let lines: Vec<&str> = headers.split("\r\n").collect();
+
+    let path = lines[0].split(" ").collect::<Vec<&str>>()[1];
+
+    let resp = match path {
+        "/" => "HTTP/1.1 200 OK\r\n\r\n",
+        _ =>"HTTP/1.1 400 Not Found\r\n\r\n",
+    };
+    stream.write_all(resp.as_bytes()).unwrap()
 
 }
