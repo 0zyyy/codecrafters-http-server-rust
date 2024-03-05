@@ -62,11 +62,15 @@ fn handle_client(mut stream: TcpStream){
                 let (_,filename) = path.split_once("/files/").unwrap();
                 let path = format!("{}/{}", dir, filename);
                 if Path::new(&path).exists() {
+                    let mut file = std::fs::read_to_string(path).unwrap();
+                    let content_length = file.len() as i32;
+                    let content_type = String::from("application/octet-stream");
+                    let content = std::mem::take(&mut file);
                     HttpResponse {
                         status_code: HttpResponseCode::Ok,
-                        content_type: String::from("application/octet-stream"),
-                        content: std::fs::read_to_string(path).unwrap(),
-                        ..HttpResponse::default()
+                        content_type,
+                        content,
+                        content_length,
                     }
                 } else {
                     HttpResponse {
