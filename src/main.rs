@@ -101,8 +101,8 @@ impl HttpResponseCode {
 
     fn text(&self) -> &str {
         match self {
-            HttpResponseCode::Ok => "",
-            HttpResponseCode::NotFound => "",
+            HttpResponseCode::Ok => "Ok",
+            HttpResponseCode::NotFound => "Not Found",
         }
     }
 }
