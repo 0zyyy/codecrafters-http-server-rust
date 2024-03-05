@@ -13,7 +13,9 @@ fn main() {
     for stream in listener.incoming() {
         match stream {
             Ok(_stream) => {
-                handle_client(_stream);
+                std::thread::spawn(move || {
+                    handle_client(_stream)
+                });
             }
             Err(e) => {
                 println!("error: {}", e);
