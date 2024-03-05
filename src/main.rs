@@ -37,6 +37,15 @@ fn handle_client(mut stream: TcpStream){
             status_code: HttpResponseCode::Ok,
             ..HttpResponse::default()
         },
+        "/user-agent" => {
+            let user_agent = lines[2].split(" ").collect::<Vec<&str>>()[1];
+            HttpResponse {
+                status_code: HttpResponseCode::Ok,
+                content_type: String::from("text/plain"),
+                content_length: user_agent.len() as i32,
+                content: user_agent.to_string(),
+            }
+        },
         _ => if path.starts_with("/echo/") {
             let (_,echo) = path.split_once("/echo/").unwrap();
             HttpResponse {
