@@ -1,5 +1,5 @@
 // Uncomment this block to pass the first stage
-use std::{io::{Read, Write}, net::{TcpListener, TcpStream}, str::from_utf8};
+use std::{io::{Read, Write}, net::{TcpListener, TcpStream}, path::Path, str::from_utf8};
 
 
 fn main() {
@@ -56,7 +56,26 @@ fn handle_client(mut stream: TcpStream){
                 content_length: echo.len() as i32,
                 content: echo.to_string(),
             }
-        } else {
+        }else if path.starts_with("/files/"){
+            let args: Vec<String> = std::env::args().collect();
+                let dir = args[2].to_string();
+                let filename = lines[2].split(" ").collect::<Vec<&str>>()[1];
+                let path = format!("{}/{}", dir, filename);
+                if Path::new(&path).exists() {
+                    HttpResponse {
+                        status_code: HttpResponseCode::Ok,
+                        content_type: String::from("application/octet-stream"),
+                        content: std::fs::read_to_string(path).unwrap(),
+                        ..HttpResponse::default()
+                    }
+                } else {
+                    HttpResponse {
+                        status_code: HttpResponseCode::NotFound,
+                        ..HttpResponse::default()
+                    }
+                }
+        } 
+        else {
             HttpResponse{
                 status_code: HttpResponseCode::NotFound,
                 ..HttpResponse::default()
