@@ -59,7 +59,7 @@ fn handle_client(mut stream: TcpStream){
         }else if path.starts_with("/files/"){
             let args: Vec<String> = std::env::args().collect();
                 let dir = args[2].to_string();
-                let filename = lines[2].split(" ").collect::<Vec<&str>>()[1].to_string();
+                let (_,filename) = path.split_once("/files/").unwrap();
                 let path = format!("{}/{}", dir, filename);
                 if Path::new(&path).exists() {
                     HttpResponse {
